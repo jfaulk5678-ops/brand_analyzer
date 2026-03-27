@@ -1,6 +1,4 @@
-[build]
-  command = "npm ci && npm run build"
-  publish = ".next"
+/** @type {import('next').NextConfig} */
+const nextConfig = {}
 
-[[plugins]]
-  package = "@netlify/plugin-nextjs"
+module.exports = nextConfig
