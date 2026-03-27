@@ -1,6 +1,6 @@
-/** @type {import('next').NextConfig} */
-const nextConfig = {
-  reactCompiler: true
-}
+[build]
+  command = "npm ci && npm run build"
+  publish = ".next"
 
-export default nextConfig
+[[plugins]]
+  package = "@netlify/plugin-nextjs"
