@@ -11,10 +11,11 @@ export function useBrandMetrics(domain?: string) {
       const res = await fetch('/api/analyze', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ brand: domain, competitor: 'competitor' })
+        body: JSON.stringify({ brand: domain })
       });
+      if (!res.ok) throw new Error('API error');
       const { report } = await res.json();
-      return { ...mockBrandData, analysis: report };  // Merge
+      return { ...mockBrandData, analysis: report };
     },
     enabled: !!domain,
   })
@@ -40,8 +41,6 @@ export function useCompetitorData(domain?: string) {
       });
       if (!res.ok) throw new Error('API error');
       const { report } = await res.json();
-      
-      // Parse AI text to chart data (simple)
       const metrics = mockCompetitorData.map(item => ({
         ...item,
         value: Math.random() * 100 + (report.includes(item.name) ? 20 : 0)
@@ -51,6 +50,42 @@ export function useCompetitorData(domain?: string) {
     enabled: !!domain,
   })
 }
+
 export function useAIEngineComparison(domain?: string) {
   return useQuery({
-    queryKey: ['ai-engine-comparison
+    queryKey: ['ai-engine-comparison', domain || 'default'],
+    queryFn: async () => {
+      if (!domain) return mockAIEngineComparison;
+      const res = await fetch('/api/analyze', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ brand: domain, type: 'ai-engines' })
+      });
+      if (!res.ok) throw new Error('API error');
+      const { report } = await res.json();
+      return { ...mockAIEngineComparison, insights: report };
+    },
+    enabled: !!domain,
+  })
+}
+
+export function useRecommendations(domain?: string) {
+  return useQuery({
+    queryKey: ['recommendations', domain || 'default'],
+    queryFn: async () => {
+      if (!domain) return mockRecommendations;
+      const res = await fetch('/api/analyze', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ brand: domain, type: 'recommendations' })
+      });
+      if (!res.ok) throw new Error('API error');
+      const { report } = await res.json();
+      return mockRecommendations.map((rec) => ({
+        ...rec,
+        priority: report.includes(rec.action) ? 'High' : 'Medium'
+      }));
+    },
+    enabled: !!domain,
+  })
+}
